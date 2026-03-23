@@ -27,8 +27,3 @@ Sistema em C# para gerenciamento de alunos, disciplinas, matrículas e notas, co
 2. Abrir no Visual Studio / VS Code  
 3. Executar o projeto  
 
----
-
-## 👥 Autores
-- Seu nome  
-- Nome do colega
