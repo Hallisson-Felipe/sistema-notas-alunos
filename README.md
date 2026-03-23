@@ -1,33 +1,34 @@
 # 📚 Sistema de Notas de Alunos
 
-Projeto desenvolvido para a disciplina de **Algoritmos e Estruturas de Dados II (AED II)**.
+Projeto da disciplina **Algoritmos e Estruturas de Dados II (AED II)**.
 
-O sistema tem como objetivo gerenciar alunos, disciplinas, matrículas e notas, realizando o cálculo de médias e informando se o aluno foi aprovado ou reprovado.
+Sistema em C# para gerenciamento de alunos, disciplinas, matrículas e notas, com cálculo de média e verificação de aprovação.
 
 ---
 
 ## 🚀 Funcionalidades
-
-### 📊 Consultas
-- Listar todos os alunos
-- Listar todas as disciplinas
-- Consultar alunos de uma disciplina
-- Consultar disciplinas de um aluno
-
-### 🛠 Cadastros
-- Cadastro de alunos
-- Cadastro de disciplinas
-- Matrícula de alunos em disciplinas
-
-### 📝 Notas
-- Atribuição de notas aos alunos
-- Cálculo de média
-- Verificação de aprovação ou reprovação
-
-### 💾 Persistência de Dados
-- Leitura de arquivos `.dat` ao iniciar o sistema
-- Salvamento automático ao sair
+- Cadastro de alunos e disciplinas  
+- Matrícula de alunos  
+- Atribuição de notas  
+- Consultas (alunos, disciplinas, relações)  
+- Leitura e gravação em arquivos `.dat`  
 
 ---
 
-## 🧱 Estrutura do Projeto
+## 🧠 Regras
+- Matrícula e código únicos  
+- Aprovado: média ≥ nota mínima  
+- Reprovado: média < nota mínima  
+
+---
+
+## ▶️ Execução
+1. Clonar o repositório  
+2. Abrir no Visual Studio / VS Code  
+3. Executar o projeto  
+
+---
+
+## 👥 Autores
+- Seu nome  
+- Nome do colega
