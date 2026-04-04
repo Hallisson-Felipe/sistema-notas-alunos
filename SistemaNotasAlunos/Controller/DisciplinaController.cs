@@ -17,6 +17,7 @@ namespace SistemaNotasAlunos.Controller
             return disciplinas;
         }
 
+        //cadastra disciplina
         public void Cadastro(string nome, double notaMinima)
         {
             disciplinas[qtdDisciplinas].Nome = nome;
@@ -25,6 +26,8 @@ namespace SistemaNotasAlunos.Controller
             
         }
 
+
+        //gera codigo de disciplina aleatorio de 3 digitos e veficica se nao ha duplicidade
         public int GerarCodigo()
         {
             int rand;
@@ -47,6 +50,25 @@ namespace SistemaNotasAlunos.Controller
                 break;
             }
             return rand;
+        }
+
+        //busca a disciplina pelo nome ou codigo
+        public Disciplina Buscar(string nome, int codigo)
+        {
+            foreach (Disciplina disciplina in disciplinas)
+            {
+                //se encontrar retonar a disciplina
+                if (disciplina.Nome == nome)
+                {
+                    return disciplina;
+                }
+                if (disciplina.Codigo == codigo)
+                {
+                    return disciplina;
+                }
+            }
+            //caso nao encontre retorna nulo
+            return null;
         }
     }
 }

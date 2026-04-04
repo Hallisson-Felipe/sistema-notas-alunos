@@ -14,8 +14,15 @@ namespace SistemaNotasAlunos.Controller
         public Aluno[] GetAlunos() { 
             return alunos;
         }
-        
-        //cadastra aluno e cria matricula aleatória com 3 dígitos
+
+        //preenche a lista a partir do arquivo Alunos.dat
+        public void PreencherLista()
+        {
+            string[] linhas = new string [100];
+
+        }
+
+        //cadastra aluno
         public void Cadastrar(string nome, int idade)
         {
             alunos[qtdAlunos].Idade = idade;
@@ -25,7 +32,7 @@ namespace SistemaNotasAlunos.Controller
         }
 
 
-        //gera a matricula verificando duplicidade
+        //gera a matricula e verifica se nao ha duplicidade
         public int GerarMatricula()
         {
             int rand;
