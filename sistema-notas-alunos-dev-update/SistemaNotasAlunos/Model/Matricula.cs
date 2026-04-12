@@ -19,9 +19,5 @@ namespace SistemaNotasAlunos.Model
             disciplina = new Disciplina();
 
         }
-        public double CalcularMedia()
-        {
-            return (Nota1 + Nota2) / 2;
-        }
     }
 }

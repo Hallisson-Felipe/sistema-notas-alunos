@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SistemaNotasAlunos")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05f46094b67b6f2e1dcb41aad8102c2bf730b6d6")]
 [assembly: System.Reflection.AssemblyProductAttribute("SistemaNotasAlunos")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SistemaNotasAlunos")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,3 +12,11 @@ C:\Users\halli\Downloads\sistema-notas-alunos-dev-update\sistema-notas-alunos-de
 C:\Users\halli\Downloads\sistema-notas-alunos-dev-update\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.pdb
 C:\Users\halli\Downloads\sistema-notas-alunos-dev-update\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.genruntimeconfig.cache
 C:\Users\halli\Downloads\sistema-notas-alunos-dev-update\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\ref\SistemaNotasAlunos.dll
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.AssemblyInfoInputs.cache
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.AssemblyInfo.cs
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.csproj.CoreCompileInputs.cache
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.sourcelink.json
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.dll
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\refint\SistemaNotasAlunos.dll
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.pdb

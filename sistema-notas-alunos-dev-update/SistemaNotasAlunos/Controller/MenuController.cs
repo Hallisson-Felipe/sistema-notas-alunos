@@ -33,7 +33,6 @@ namespace SistemaNotasAlunos.Controller
                     break;
                 case 2:
                     int cadastro = MenuView.ExibirMenuCadastros();
-                    Console.WriteLine($"Cadastro escolhido: {cadastro}");
                     break;
                 case 3:
                     //salvar

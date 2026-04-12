@@ -1,0 +1,40 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE settings
+.vscode/
+
+# Logs
+*.log
+
+# .NET
+*.dll
+*.exe
+*.pdb
+*.cache
+*.runtimeconfig.json
+*.deps.json
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Test results
+TestResults/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database / local data (se tiver)
+*.db
+*.sqlite

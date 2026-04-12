@@ -21,20 +21,24 @@ namespace SistemaNotasAlunos.Controller
             var disciplinasLidas = ar.LerDisciplinas();
             disciplinas = new Disciplina[100];
             qtdDisciplinas = 0;
-            for (int i = 0; i < disciplinasLidas.Length; i++)
+            if(disciplinasLidas != null)
             {
-                disciplinas[i] = disciplinasLidas[i];
-                qtdDisciplinas++;
+                for (int i = 0; i < disciplinasLidas.Length; i++)
+                {
+                    disciplinas[i] = disciplinasLidas[i];
+                    qtdDisciplinas++;
+                }
             }
         }
 
         //cadastra disciplina
         public void Cadastro(string nome, double notaMinima)
         {
+            disciplinas[qtdDisciplinas] = new Disciplina();
             disciplinas[qtdDisciplinas].Nome = nome;
             disciplinas[qtdDisciplinas].NotaMinima = notaMinima;
             disciplinas[qtdDisciplinas].Codigo = GerarCodigo();
-            
+            qtdDisciplinas++;
         }
 
 
@@ -66,19 +70,13 @@ namespace SistemaNotasAlunos.Controller
         //busca a disciplina pelo nome ou codigo
         public Disciplina Buscar(string nome, int codigo)
         {
-            foreach (Disciplina disciplina in disciplinas)
+            for (int i = 0; i < qtdDisciplinas; i++)
             {
-                //se encontrar retonar a disciplina
-                if (disciplina.Nome == nome)
+                if (disciplinas[i].Nome == nome || disciplinas[i].Codigo == codigo)
                 {
-                    return disciplina;
-                }
-                if (disciplina.Codigo == codigo)
-                {
-                    return disciplina;
+                    return disciplinas[i];
                 }
             }
-            //caso nao encontre retorna nulo
             return null;
         }
     }
