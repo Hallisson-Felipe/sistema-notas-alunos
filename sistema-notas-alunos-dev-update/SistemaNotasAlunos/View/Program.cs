@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SistemaNotasAlunos.Controller;
+using SistemaNotasAlunos.View;
 
-// quero testar o menu consultas, para consultar os alunos cadastrados na disciplina
-namespace SistemaNotasAlunos.View
+namespace SistemaNotasAlunos
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             MenuView.ExibirMenuPrincipal();
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +9,9 @@ namespace SistemaNotasAlunos.Controller
 {
     public class MenuController
     {
-        public AlunoController ac {  get; set; }
-        public DisciplinaController dc {  get; set; }
-        public MatriculaController mc {  get; set; }
+        public AlunoController ac { get; set; }
+        public DisciplinaController dc { get; set; }
+        public MatriculaController mc { get; set; }
 
         public MenuController()
         {
@@ -21,27 +20,33 @@ namespace SistemaNotasAlunos.Controller
             mc = new MatriculaController();
         }
 
-        int opcao = MenuView.ExibirMenuPrincipal();
-
+        // CORREÇÃO 3: "int opcao = MenuView.ExibirMenuPrincipal()" foi removido do campo.
+        // Como campo inicializador, ele era executado durante o new MenuController(),
+        // mas MenuView possui "static MenuController menuController = new MenuController()",
+        // criando dependência circular: MenuView inicializa MenuController que chama MenuView,
+        // onde menuController ainda é null — causando NullReferenceException na primeira opção escolhida.
         public void MostrarSubMenu()
         {
+            int opcao = MenuView.ExibirMenuPrincipal();
+
             switch (opcao)
             {
-                
                 case 1:
                     MenuView.ExibirMenuConsultas();
+                    opcao = 0;
                     break;
                 case 2:
-                    int cadastro = MenuView.ExibirMenuCadastros();
+                    MenuView.ExibirMenuCadastros();
+                    opcao = 0;
                     break;
                 case 3:
-                    //salvar
+                    // salvar
+                    opcao = 0;
                     break;
                 case 4:
-                    //sair
+                    // sair
                     break;
             }
-
         }
     }
 }

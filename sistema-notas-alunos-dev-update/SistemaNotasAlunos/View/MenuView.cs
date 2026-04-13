@@ -2,11 +2,11 @@
 using SistemaNotasAlunos.View;
 using System;
 using SistemaNotasAlunos.Model;
+
 namespace SistemaNotasAlunos.View
 {
     public static class MenuView
     {
-
         static MenuController menuController = new MenuController();
 
         public static int ExibirMenuPrincipal()
@@ -14,7 +14,7 @@ namespace SistemaNotasAlunos.View
             while (true)
             {
                 Console.Clear();
-                ExibirCabecalhos("SISTEMA DE NOTAS DE ALUNOS");
+                ExibirCabecalho("SISTEMA DE NOTAS DE ALUNOS");
                 Console.WriteLine("1. Consultas");
                 Console.WriteLine("2. Cadastros");
                 Console.WriteLine("3. Salvar");
@@ -24,17 +24,11 @@ namespace SistemaNotasAlunos.View
 
                 switch (Console.ReadLine())
                 {
-                    case "1":
-                        Console.WriteLine("Opção 'Consultas' selecionada.");
-                        return 1;
-                    case "2":
-                        Console.WriteLine("Opção 'Cadastros' selecionada.");
-                        return 2;
-                    case "3":
-                        Console.WriteLine("Opção 'Salvar' selecionada.");
-                        return 3;
+                    case "1": return 1;
+                    case "2": return 2;
+                    case "3": return 3;
                     case "4":
-                        Console.WriteLine("Opção 'Sair' selecionada. Encerrando o programa...");
+                        Console.WriteLine("Encerrando o programa...");
                         return 4;
                     default:
                         Console.WriteLine("Opção inválida. Digite um número entre 1 e 4.");
@@ -49,7 +43,7 @@ namespace SistemaNotasAlunos.View
             while (true)
             {
                 Console.Clear();
-                ExibirCabecalhos("CONSULTAS");
+                ExibirCabecalho("CONSULTAS");
                 Console.WriteLine("  1. Alunos");
                 Console.WriteLine("  2. Disciplinas");
                 Console.WriteLine("  3. Alunos da Disciplina");
@@ -60,68 +54,63 @@ namespace SistemaNotasAlunos.View
 
                 switch (Console.ReadLine())
                 {
-
-                    //consulta de alunos por nome ou matricula
                     case "1":
-                        Console.WriteLine("Opção 'Alunos' selecionada.");
-                        Console.WriteLine("entre com o nome ou a matricula do aluno para consultar:");
+                        Console.Write("Nome ou matrícula do aluno: ");
                         string resp = Console.ReadLine();
-                        Aluno aluno = menuController.ac.Buscar(resp, int.Parse(resp));
-                        if(aluno == null)
+                        // CORREÇÃO 4: int.Parse substituído por TryParse — evita FormatException
+                        // quando o usuário digita um nome em vez de número.
+                        int matBusca = int.TryParse(resp, out int mb) ? mb : -1;
+                        Aluno aluno = menuController.ac.Buscar(resp, matBusca);
+                        if (aluno == null)
                         {
                             Console.WriteLine("Aluno não encontrado.");
-                            Console.ReadKey();
-                            ExibirMenuConsultas();
                         }
                         else
                         {
-                            Console.WriteLine($"Aluno encontrado: {aluno.Nome}, Matricula: {aluno.Matricula}, Idade: {aluno.Idade}");
-
+                            Console.WriteLine($"Aluno: {aluno.Nome} | Matrícula: {aluno.Matricula} | Idade: {aluno.Idade}");
                         }
-                        break;
+                        Console.ReadKey();
+                        continue;
 
-
-                    //consulta de disciplinas por nome ou codigo
                     case "2":
-                        Console.WriteLine("Opção 'Disciplinas' selecionada.");
-                        Console.WriteLine("entre com o nome ou o código da disciplina para consultar:");
+                        Console.Write("Nome ou código da disciplina: ");
                         string resp2 = Console.ReadLine();
-                        Disciplina disciplina = menuController.dc.Buscar(resp2, int.Parse(resp2));
-                        if(disciplina == null)
+                        int codBusca = int.TryParse(resp2, out int cb) ? cb : -1;
+                        Disciplina disciplina = menuController.dc.Buscar(resp2, codBusca);
+                        if (disciplina == null)
                         {
-                            Console.WriteLine("Dispciplina não encontrada.");
-                            Console.ReadKey();
-                            ExibirMenuConsultas();
+                            Console.WriteLine("Disciplina não encontrada.");
                         }
-
-
+                        else
+                        {
+                            Console.WriteLine($"Disciplina: {disciplina.Nome} | Código: {disciplina.Codigo} | Nota Mínima: {disciplina.NotaMinima}");
+                        }
+                        Console.ReadKey();
                         break;
 
-                    //consulta de alunos matriculados em uma disciplina
                     case "3":
-                        Console.WriteLine("Opção 'Alunos da Disciplina' selecionada.");
-                        Console.WriteLine("entre com o nome ou o código da disciplina para consultar os alunos matriculados:");
+                        Console.Write("Nome ou código da disciplina: ");
                         string resp3 = Console.ReadLine();
-                        Console.WriteLine(menuController.mc.AlunosDaDisciplina(resp3, int.Parse(resp3)));
+                        int codDisc3 = int.TryParse(resp3, out int cd3) ? cd3 : -1;
+                        Console.WriteLine(menuController.mc.AlunosDaDisciplina(resp3, codDisc3));
+                        Console.ReadKey();
                         break;
 
-
-                    //consulta de disciplinas em que um aluno está matriculado
                     case "4":
-                        Console.WriteLine("Opção 'Disciplinas do Aluno' selecionada.");
-                        Console.WriteLine("entre com o nome ou a matricula do aluno para consultar as disciplinas em que ele está matriculado:");
+                        Console.Write("Nome ou matrícula do aluno: ");
                         string resp4 = Console.ReadLine();
-                        string disciplinasMatriculadas = menuController.mc.DisciplinasDoAluno(resp4, int.Parse(resp4));
-                        foreach (var nomeDisciplina in disciplinasMatriculadas.Split(";"))
-                        {
-                            Console.WriteLine(nomeDisciplina);
-                        }
+                        int matAluno4 = int.TryParse(resp4, out int ma4) ? ma4 : -1;
+                        string disciplinas = menuController.mc.DisciplinasDoAluno(resp4, matAluno4);
+                        foreach (var nome in disciplinas.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                            Console.WriteLine(nome);
+                        Console.ReadKey();
                         break;
-
 
                     case "0":
+                        // CORREÇÃO 5: estava chamando ExibirMenuConsultas() (a si mesmo) em vez de ExibirMenuPrincipal().
                         ExibirMenuPrincipal();
                         break;
+
                     default:
                         Console.WriteLine("Opção inválida. Digite um número entre 0 e 4.");
                         Console.ReadKey();
@@ -130,13 +119,12 @@ namespace SistemaNotasAlunos.View
             }
         }
 
-
         public static int ExibirMenuCadastros()
         {
             while (true)
             {
                 Console.Clear();
-                ExibirCabecalhos("CADASTROS");
+                ExibirCabecalho("CADASTROS");
                 Console.WriteLine("  1. Alunos");
                 Console.WriteLine("  2. Disciplinas");
                 Console.WriteLine("  3. Matrículas");
@@ -148,72 +136,99 @@ namespace SistemaNotasAlunos.View
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        Console.WriteLine("Opção 'Alunos' selecionada.");
-                        Console.WriteLine("Entre com o nome do aluno: ");
+                        Console.Write("Nome do aluno: ");
                         string nomeAluno = Console.ReadLine();
-                        Console.WriteLine("Entre com a idade do aluno: ");
-                        int idadeAluno = int.Parse(Console.ReadLine());
+                        Console.Write("Idade do aluno: ");
+                        if (!int.TryParse(Console.ReadLine(), out int idadeAluno))
+                        {
+                            Console.WriteLine("Idade inválida.");
+                            Console.ReadKey();
+                            break;
+                        }
                         menuController.ac.Cadastrar(nomeAluno, idadeAluno);
                         Console.WriteLine("Aluno cadastrado com sucesso!");
+                        Console.ReadKey();
                         break;
 
                     case "2":
-                        Console.WriteLine("Opção 'Disciplinas' selecionada.");
-                        Console.WriteLine("Entre com o nome da disciplina: ");
+                        Console.Write("Nome da disciplina: ");
                         string nomeDisciplina = Console.ReadLine();
-                        Console.WriteLine("Entre com o código da disciplina: ");
-                        int codigoDisciplina = int.Parse(Console.ReadLine());
-                        menuController.dc.Cadastro(nomeDisciplina, codigoDisciplina);
+                        // CORREÇÃO 6: perguntava "código" e passava int, mas Cadastro espera
+                        // notaMinima (double) como segundo parâmetro.
+                        Console.Write("Nota mínima para aprovação: ");
+                        if (!double.TryParse(Console.ReadLine(), out double notaMinima))
+                        {
+                            Console.WriteLine("Nota inválida.");
+                            Console.ReadKey();
+                            break;
+                        }
+                        menuController.dc.Cadastro(nomeDisciplina, notaMinima);
                         Console.WriteLine("Disciplina cadastrada com sucesso!");
+                        Console.ReadKey();
                         break;
 
                     case "3":
-                        Console.WriteLine("Opção 'Matrículas' selecionada.");
-                        Console.WriteLine("Entre com o nome ou a matricula do aluno para matricular: ");
+                        Console.Write("Nome ou matrícula do aluno: ");
                         string respAluno = Console.ReadLine();
-                        Console.WriteLine("Entre com o nome ou o código da disciplina para matricular: ");
-                        string respDisciplina = Console.ReadLine();
-                        menuController.mc.Cadastro(respAluno, int.Parse(respAluno), respDisciplina, int.Parse(respDisciplina));
+                        Console.Write("Nome ou código da disciplina: ");
+                        string respDisc = Console.ReadLine();
+                        int matAluno3 = int.TryParse(respAluno, out int ma3) ? ma3 : -1;
+                        int codDisc3b = int.TryParse(respDisc, out int cd3b) ? cd3b : -1;
 
-                        if (menuController.mc.Cadastro(respAluno, int.Parse(respAluno), respDisciplina, int.Parse(respDisciplina)) == "Aluno não encontrado.")
+                        // CORREÇÃO 7: Cadastro era chamado 3 vezes (1 antes dos ifs + 2 dentro),
+                        // inserindo a matrícula em triplicata. Agora é chamado apenas uma vez.
+                        string resultado = menuController.mc.Cadastro(respAluno, matAluno3, respDisc, codDisc3b);
+
+                        if (resultado == "Aluno não encontrado.")
                         {
                             Console.WriteLine("Aluno não encontrado. Matrícula não realizada.");
-                            Console.ReadKey();
-                            ExibirMenuCadastros();
                         }
-
-                        else if (menuController.mc.Cadastro(respAluno, int.Parse(respAluno), respDisciplina, int.Parse(respDisciplina)))
+                        // CORREÇÃO 8: "else if (Cadastro(...))" comparava string com bool (CS0029).
+                        else if (resultado == "Disciplina não encontrada.")
                         {
                             Console.WriteLine("Disciplina não encontrada. Matrícula não realizada.");
-                            Console.ReadKey();
-                            ExibirMenuCadastros();
                         }
-                        Console.WriteLine("Matrícula realizada com sucesso!");
+                        else
+                        {
+                            Console.WriteLine("Matrícula realizada com sucesso!");
+                        }
+                        Console.ReadKey();
                         break;
 
                     case "4":
-                        Console.WriteLine("Opção 'Atribuir Nota a Aluno' selecionada.");
-                        Console.WriteLine("Entre com o nome ou a matricula do aluno para atribuir a nota: ");
-                        string AlunoNota = Console.ReadLine();
-                        Console.WriteLine("Entre com o nome ou o código da disciplina para atribuir a nota: ");
-                        string DisciplinaNota = Console.ReadLine();
-                        Console.WriteLine("Entre com a nota 1: ");
-                        double nota1 = double.Parse(Console.ReadLine());
-                        Console.WriteLine("Entre com a nota 2: ");
-                        double nota2 = double.Parse(Console.ReadLine());
+                        Console.Write("Nome ou matrícula do aluno: ");
+                        string alunoNota = Console.ReadLine();
+                        Console.Write("Nome ou código da disciplina: ");
+                        string discNota = Console.ReadLine();
+                        Console.Write("Nota 1: ");
+                        if (!double.TryParse(Console.ReadLine(), out double nota1))
+                        {
+                            Console.WriteLine("Nota 1 inválida.");
+                            Console.ReadKey();
+                            break;
+                        }
+                        Console.Write("Nota 2: ");
+                        if (!double.TryParse(Console.ReadLine(), out double nota2))
+                        {
+                            Console.WriteLine("Nota 2 inválida.");
+                            Console.ReadKey();
+                            break;
+                        }
 
-                        Aluno aluno = new Aluno();
-                        Disciplina disciplina = new Disciplina();
+                        int matNota = int.TryParse(alunoNota, out int mn) ? mn : -1;
+                        int codNota = int.TryParse(discNota, out int cn) ? cn : -1;
 
-                        aluno = menuController.ac.Buscar(AlunoNota, int.Parse(AlunoNota));
-                        disciplina = menuController.dc.Buscar(DisciplinaNota, int.Parse(DisciplinaNota));
-                        menuController.mc.AtribuirNota(aluno, disciplina, nota1, nota2);
-                        Console.WriteLine("Nota atribuída com sucesso!");
-
+                        // CORREÇÃO 9: chamada passava objetos Aluno/Disciplina onde o método
+                        // espera string/int (CS1503). Agora passa strings e ints corretamente.
+                        bool atribuido = menuController.mc.AtribuirNota(alunoNota, matNota, discNota, codNota, nota1, nota2);
+                        Console.WriteLine(atribuido ? "Nota atribuída com sucesso!" : "Aluno ou disciplina não encontrados.");
+                        Console.ReadKey();
                         break;
+
                     case "0":
-                        ExibirMenuCadastros();
-                        break;
+                        menuController.MostrarSubMenu();
+                        return 0;
+
                     default:
                         Console.WriteLine("Opção inválida. Digite um número entre 0 e 4.");
                         Console.ReadKey();
@@ -222,7 +237,7 @@ namespace SistemaNotasAlunos.View
             }
         }
 
-        internal static void ExibirCabecalhos(string titulo)
+        internal static void ExibirCabecalho(string titulo)
         {
             ExibirSeparador();
             Console.WriteLine($"  {titulo}");
@@ -235,5 +250,3 @@ namespace SistemaNotasAlunos.View
         }
     }
 }
-
-

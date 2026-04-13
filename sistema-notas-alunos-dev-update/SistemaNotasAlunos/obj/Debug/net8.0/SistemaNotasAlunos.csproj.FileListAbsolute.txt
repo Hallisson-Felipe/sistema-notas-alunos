@@ -20,3 +20,10 @@ C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotas
 C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.dll
 C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\refint\SistemaNotasAlunos.dll
 C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.pdb
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\bin\Debug\net8.0\SistemaNotasAlunos.exe
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\bin\Debug\net8.0\SistemaNotasAlunos.deps.json
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\bin\Debug\net8.0\SistemaNotasAlunos.runtimeconfig.json
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\bin\Debug\net8.0\SistemaNotasAlunos.dll
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\bin\Debug\net8.0\SistemaNotasAlunos.pdb
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\SistemaNotasAlunos.genruntimeconfig.cache
+C:\Users\Arthu\Desktop\SistemaNotas\sistema-notas-alunos-dev-update\SistemaNotasAlunos\obj\Debug\net8.0\ref\SistemaNotasAlunos.dll

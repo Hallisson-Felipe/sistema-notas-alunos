@@ -14,47 +14,39 @@ namespace SistemaNotasAlunos.Controller
         Matricula[] matriculas = new Matricula[100];
         int qtdMatriculas = 0;
 
-        //instancia o controller de arquivo para ler os matriculas do arquivo e preencher o vetor de matriculas
         ArquivoController ar = new ArquivoController();
 
-        //construtor do controller de matricula, le as matriculas do arquivo e preenche o vetor de metriculas
+        // CORREÇÃO 1: loop duplo removido — null check estava dentro do for externo,
+        // causando N inserções duplicadas de cada matrícula (N = total de matrículas).
         public MatriculaController()
         {
             var matriculasLidas = ar.LerMatricula(alunoController.alunos, disciplinaController.disciplinas);
-
             qtdMatriculas = 0;
 
-            for (int i = 0; i < matriculasLidas.Length; i++)
-                if (matriculasLidas != null)
+            if (matriculasLidas != null)
+            {
+                for (int i = 0; i < matriculasLidas.Length && i < matriculas.Length; i++)
                 {
-                    for (int j = 0; j < matriculasLidas.Length && j < matriculas.Length; j++)
-                    {
-                        matriculas[j] = matriculasLidas[j];
-                        qtdMatriculas++;
-                    }
+                    matriculas[i] = matriculasLidas[i];
+                    qtdMatriculas++;
                 }
+            }
         }
 
-        //cadastra a matricula pegando o nome/matricula do aluno e o nome/codigo da disciplina
         public string Cadastro(string nomeAluno = "", int matriculaAluno = -1, string nomeDisciplina = "", int codigoDisciplina = -1)
         {
             Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
             Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
 
             if (aluno == null)
-            {
                 return "Aluno não encontrado.";
-            }
 
             if (disciplina == null)
-            {
                 return "Disciplina não encontrada.";
-            }
 
             matriculas[qtdMatriculas] = new Matricula();
             matriculas[qtdMatriculas].aluno = aluno;
             matriculas[qtdMatriculas].disciplina = disciplina;
-
             qtdMatriculas++;
 
             return null;
@@ -66,37 +58,26 @@ namespace SistemaNotasAlunos.Controller
             Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
 
             if (disciplina == null)
-            {
                 return "Disciplina não encontrada.";
-            }
 
             for (int i = 0; i < qtdMatriculas; i++)
             {
-                if (matriculas[i] == null)
-                {
-                    continue;
-                }
+                if (matriculas[i] == null) continue;
 
                 if (matriculas[i].disciplina.Codigo == disciplina.Codigo)
                 {
                     double nota1 = matriculas[i].Nota1;
                     double nota2 = matriculas[i].Nota2;
                     double media = (nota1 + nota2) / 2;
-
                     string status = media >= disciplina.NotaMinima ? "Aprovado" : "Reprovado";
 
                     resultado += $"Aluno: {matriculas[i].aluno.Nome} | " +
                                  $"Nota1: {nota1} | Nota2: {nota2} | " +
-                                 $"Média: {media} | {status}\n";
+                                 $"Média: {media:F2} | {status}\n";
                 }
             }
 
-            if (resultado == "")
-            {
-                return "Nenhum aluno encontrado para essa disciplina.";
-            }
-
-            return resultado;
+            return resultado == "" ? "Nenhum aluno encontrado para essa disciplina." : resultado;
         }
 
         public string DisciplinasDoAluno(string nomeAluno = "", int matriculaAluno = -1)
@@ -109,15 +90,10 @@ namespace SistemaNotasAlunos.Controller
 
             for (int i = 0; i < qtdMatriculas; i++)
             {
-                if (matriculas[i] == null)
-                {
-                    continue;
-                }
+                if (matriculas[i] == null) continue;
 
                 if (matriculas[i].aluno.Matricula == aluno.Matricula)
-                {
                     nomes += matriculas[i].disciplina.Nome + ";";
-                }
             }
 
             return nomes;
@@ -128,38 +104,28 @@ namespace SistemaNotasAlunos.Controller
             return (nota1 + nota2) / 2;
         }
 
-        public bool AtribuirNota(string nomeAluno = "", int matriculaAluno = -1, string nomeDisciplina = "", int codigoDisciplina = -1, double nota = 0)
+        // CORREÇÃO 2: assinatura corrigida para receber nota1 e nota2 separadas.
+        // Antes o parâmetro era "double nota" e o corpo referenciava variáveis nota1/nota2
+        // inexistentes, além de tentar acessar campos nota1/nota2 (minúsculos) que não existem no model.
+        public bool AtribuirNota(string nomeAluno = "", int matriculaAluno = -1,
+                                  string nomeDisciplina = "", int codigoDisciplina = -1,
+                                  double nota1 = 0, double nota2 = 0)
         {
             Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
             Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
 
             if (aluno == null || disciplina == null)
-            {
                 return false;
-            }
 
             for (int i = 0; i < qtdMatriculas; i++)
             {
-                if (matriculas[i] == null)
-                {
-                    continue;
-                }
+                if (matriculas[i] == null) continue;
 
                 if (matriculas[i].aluno.Matricula == aluno.Matricula &&
                     matriculas[i].disciplina.Codigo == disciplina.Codigo)
                 {
-                    matriculas[i].nota1 = nota1;
-                    matriculas[i].nota2 = nota2;
-
-                    if (matriculas[i].Nota1 == 0)
-                    {
-                        matriculas[i].Nota1 = nota;
-                    }
-                    else
-                    {
-                        matriculas[i].Nota2 = nota;
-                    }
-
+                    matriculas[i].Nota1 = nota1;
+                    matriculas[i].Nota2 = nota2;
                     return true;
                 }
             }
