@@ -1,49 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using SistemaNotasAlunos.Model;
 
 namespace SistemaNotasAlunos.Controller
 {
+    // controller de disciplinas
     public class DisciplinaController
     {
-        
-        public Disciplina[] disciplinas { get; set; }
-        int qtdDisciplinas = 0;
+        // lista duplamente encadeada de disciplinas
+        public ListaDisciplinas disciplinas { get; set; }
 
-        //instancia o controller de arquivo
-        ArquivoController ar = new ArquivoController();
+        private ArquivoController ar = new ArquivoController();
 
-        //construtor de DiciplinaController que que le as disciplinad do arquivo e preenche o vetor
+        // construtor: carrega as disciplinas do arquivo ao iniciar
         public DisciplinaController()
         {
-            var disciplinasLidas = ar.LerDisciplinas();
-            disciplinas = new Disciplina[100];
-            qtdDisciplinas = 0;
-            if(disciplinasLidas != null)
-            {
-                for (int i = 0; i < disciplinasLidas.Length; i++)
-                {
-                    disciplinas[i] = disciplinasLidas[i];
-                    qtdDisciplinas++;
-                }
-            }
+            disciplinas = ar.LerDisciplinas();
         }
 
-        //cadastra disciplina
+        // cadastra disciplina
         public void Cadastro(string nome, double notaMinima)
         {
-            disciplinas[qtdDisciplinas] = new Disciplina();
-            disciplinas[qtdDisciplinas].Nome = nome;
-            disciplinas[qtdDisciplinas].NotaMinima = notaMinima;
-            disciplinas[qtdDisciplinas].Codigo = GerarCodigo();
-            qtdDisciplinas++;
+            Disciplina novaDisciplina = new Disciplina
+            {
+                Nome = nome,
+                NotaMinima = notaMinima,
+                Codigo = GerarCodigo()
+            };
+
+            // adiciona na lista
+            disciplinas.Adicionar(novaDisciplina);
         }
 
-
-        //gera codigo de disciplina aleatorio de 3 digitos e veficica se nao ha duplicidade
+        // gera codigo de 3 digitos sem repetir
         public int GerarCodigo()
         {
             int rand;
@@ -51,48 +39,58 @@ namespace SistemaNotasAlunos.Controller
             {
                 bool find = false;
                 rand = Random.Shared.Next(100, 1000);
-                for (int i = 0; i < qtdDisciplinas; i++)
+
+                // percorre a lista procurando se o codigo ja existe
+                NodeDisciplina atual = disciplinas.Head;
+                while (atual != null)
                 {
-                    if (disciplinas[i].Codigo == rand)
+                    if (atual.Value != null && atual.Value.Codigo == rand)
                     {
                         find = true;
                         break;
                     }
+                    atual = atual.Next;
                 }
-                if (find)
+
+                if (!find)
                 {
-                    continue;
+                    break;
                 }
-                break;
             }
             return rand;
         }
 
-        //busca a disciplina pelo nome ou codigo
+        // busca disciplina por nome ou por codigo
         public Disciplina Buscar(string nome, int codigo)
         {
-            for (int i = 0; i < qtdDisciplinas; i++)
+            // percorre a lista do inicio ao fim
+            NodeDisciplina atual = disciplinas.Head;
+            while (atual != null)
             {
-                if (disciplinas[i].Nome.Trim().Equals(nome.Trim(), StringComparison.OrdinalIgnoreCase)|| disciplinas[i].Codigo == codigo)
+                Disciplina d = atual.Value;
+                if (d != null)
                 {
-                    return disciplinas[i];
+                    // ve se o nome bate (ignora maiuscula/minuscula)
+                    if (!string.IsNullOrEmpty(nome) && d.Nome.Trim().ToLower() == nome.Trim().ToLower())
+                    {
+                        return d;
+                    }
+
+                    // ve se o codigo bate
+                    if (codigo != -1 && d.Codigo == codigo)
+                    {
+                        return d;
+                    }
                 }
+                atual = atual.Next;
             }
-            //caso nao encontre o aluno no vetor, retorna nulo
             return null;
         }
 
-        //grava as disciplinas no arquivo DAT
+        // grava as disciplinas
         public void GravarDisciplinas()
         {
-            Disciplina[] disciplinasValidas = new Disciplina[qtdDisciplinas];
-
-            for (int i = 0; i < qtdDisciplinas; i++)
-            {
-                disciplinasValidas[i] = disciplinas[i];
-            }
-
-            ar.GravarDisciplinas(disciplinasValidas);
+            ar.GravarDisciplinas(disciplinas);
         }
     }
 }

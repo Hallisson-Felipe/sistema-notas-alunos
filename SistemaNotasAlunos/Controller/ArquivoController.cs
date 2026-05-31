@@ -1,195 +1,209 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SistemaNotasAlunos.Model;
+using System;
 using System.IO;
+using SistemaNotasAlunos.Model;
 
 namespace SistemaNotasAlunos.Controller
 {
+    // controller de arquivos dat
     public class ArquivoController
     {
-        // metodo que le o arquivo, preenche e retorna um vetor de Aluno
-        public Aluno[] LerAlunos()
+        // le alunos do arquivo dat e retorna uma lista encadeada
+        public ListaAlunos LerAlunos()
         {
-            int count = 0;
+            var alunos = new ListaAlunos();
 
-            // conta quantos alunos tem no arquivo para criar o vetor do tamanho correto
-            using (StreamReader sr = new StreamReader("Alunos.dat"))
+            if (!File.Exists("Alunos.dat"))
             {
-                while (sr.ReadLine() != null)
-                {
-                    count++;
-                }
+                return alunos;
             }
 
-            // cria o vetor com o tamanho exato
-            Aluno[] alunos = new Aluno[count];
-
-            // le o arquivo novamente e preenche o vetor de alunos
             using (StreamReader sr = new StreamReader("Alunos.dat"))
             {
                 string linha;
-                int i = 0;
-
+                // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
-                    var partes = linha.Split(';'); 
+                    if (string.IsNullOrWhiteSpace(linha)) continue;
 
-                    alunos[i] = new Aluno
+                    // cada linha tem: matricula;nome;idade
+                    var partes = linha.Split(';');
+                    if (partes.Length >= 3)
                     {
-                        Matricula = int.Parse(partes[0]),
-                        Nome = partes[1],
-                        Idade = int.Parse(partes[2]),
-                    };
-
-                    i++;
+                        var aluno = new Aluno
+                        {
+                            Matricula = int.Parse(partes[0]),
+                            Nome = partes[1],
+                            Idade = int.Parse(partes[2])
+                        };
+                        alunos.Adicionar(aluno);
+                    }
                 }
             }
 
             return alunos;
         }
 
-        // metodo que le o arquivo, preenche e retorna um vetor de Disciplina
-        public Disciplina[] LerDisciplinas()
+        // le disciplinas do arquivo dat e retorna uma lista encadeada
+        public ListaDisciplinas LerDisciplinas()
         {
-            int count = 0;
+            var disciplinas = new ListaDisciplinas();
 
-            // conta quantas disciplinas existem no arquivo
-            using (StreamReader sr = new StreamReader("Disciplinas.dat"))
+            if (!File.Exists("Disciplinas.dat"))
             {
-                while (sr.ReadLine() != null)
-                {
-                    count++;
-                }
+                return disciplinas;
             }
-
-            // cria o vetor com o tamanho correto
-            Disciplina[] disciplinas = new Disciplina[count];
 
             using (StreamReader sr = new StreamReader("Disciplinas.dat"))
             {
                 string linha;
-                int i = 0;
-
+                // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
-                    var partes = linha.Split(';'); 
+                    if (string.IsNullOrWhiteSpace(linha)) continue;
 
-                    disciplinas[i] = new Disciplina
+                    // cada linha tem: codigo;nome;notaminima
+                    var partes = linha.Split(';');
+                    if (partes.Length >= 3)
                     {
-                        Codigo = int.Parse(partes[0]),
-                        Nome = partes[1],
-                        NotaMinima = double.Parse(partes[2]),
-                    };
-
-                    i++;
+                        var disciplina = new Disciplina
+                        {
+                            Codigo = int.Parse(partes[0]),
+                            Nome = partes[1],
+                            NotaMinima = double.Parse(partes[2])
+                        };
+                        disciplinas.Adicionar(disciplina);
+                    }
                 }
             }
 
             return disciplinas;
         }
 
-        // metodo que le o arquivo de matriculas e relaciona com alunos e disciplinas
-        public Matricula[] LerMatricula(Aluno[] alunos, Disciplina[] disciplinas)
+        // le matriculas do arquivo dat, ligando cada uma ao aluno e disciplina certos
+        public ListaMatriculas LerMatricula(ListaAlunos alunos, ListaDisciplinas disciplinas)
         {
-            int count = 0;
+            var matriculas = new ListaMatriculas();
 
-            // conta quantas matriculas existem no arquivo
-            using (StreamReader sr = new StreamReader("Matriculas.dat"))
+            if (!File.Exists("Matriculas.dat"))
             {
-                while (sr.ReadLine() != null)
-                {
-                    count++;
-                }
+                return matriculas;
             }
-            //cria o vetor do tamanho certo
-            Matricula[] matriculas = new Matricula[count];
 
             using (StreamReader sr = new StreamReader("Matriculas.dat"))
             {
                 string linha;
-                int i = 0;
-
+                // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
+                    if (string.IsNullOrWhiteSpace(linha)) continue;
+
+                    // cada linha tem: codigoDisciplina;matriculaAluno;nota1;nota2
                     var partes = linha.Split(';');
-
-                    Matricula m = new Matricula();
-
-                    int codigoDisciplina = int.Parse(partes[0]);
-                    int matriculaAluno = int.Parse(partes[1]);
-
-                    // procura a disciplina correspondente no vetor
-                    for (int j = 0; j < disciplinas.Length; j++)
+                    if (partes.Length >= 4)
                     {
-                        if (disciplinas[j].Codigo == codigoDisciplina)
+                        int codigoDisciplina = int.Parse(partes[0]);
+                        int matriculaAluno = int.Parse(partes[1]);
+                        double nota1 = double.Parse(partes[2]);
+                        double nota2 = double.Parse(partes[3]);
+
+                        // busca a disciplina correspondente percorrendo a lista
+                        Disciplina disc = null;
+                        NodeDisciplina atualDisc = disciplinas.Head;
+                        while (atualDisc != null)
                         {
-                            m.disciplina = disciplinas[j];
-                            break;
+                            if (atualDisc.Value != null && atualDisc.Value.Codigo == codigoDisciplina)
+                            {
+                                disc = atualDisc.Value;
+                                break;
+                            }
+                            atualDisc = atualDisc.Next;
+                        }
+
+                        // busca o aluno correspondente percorrendo a lista
+                        Aluno alu = null;
+                        NodeAluno atualAlu = alunos.Head;
+                        while (atualAlu != null)
+                        {
+                            if (atualAlu.Value != null && atualAlu.Value.Matricula == matriculaAluno)
+                            {
+                                alu = atualAlu.Value;
+                                break;
+                            }
+                            atualAlu = atualAlu.Next;
+                        }
+
+                        // so adiciona se encontrou os dois
+                        if (disc != null && alu != null)
+                        {
+                            var m = new Matricula
+                            {
+                                aluno = alu,
+                                disciplina = disc,
+                                Nota1 = nota1,
+                                Nota2 = nota2
+                            };
+                            matriculas.Adicionar(m);
                         }
                     }
-
-                    // procura o aluno correspondente no vetor
-                    for (int j = 0; j < alunos.Length; j++)
-                    {
-                        if (alunos[j].Matricula == matriculaAluno)
-                        {
-                            m.aluno = alunos[j];
-                            break;
-                        }
-                    }
-
-                    // atribui as notas da matricula
-                    m.Nota1 = double.Parse(partes[2]);
-                    m.Nota2 = double.Parse(partes[3]);
-
-                    matriculas[i] = m;
-                    i++;
                 }
             }
 
             return matriculas;
         }
 
-        //metodo que grava os alunos no arquivo
-        public void GravarAlunos(Aluno[] alunos)
+        // grava os alunos no arquivo percorrendo a lista encadeada
+        public void GravarAlunos(ListaAlunos alunos)
         {
             using (StreamWriter sw = new StreamWriter("Alunos.dat"))
             {
-                // grava cada aluno em uma linha, separando os campos por ';'
-                foreach (var aluno in alunos)
+                NodeAluno atual = alunos.Head;
+                while (atual != null)
                 {
-                    sw.WriteLine($"{aluno.Matricula};{aluno.Nome};{aluno.Idade}");
+                    Aluno alu = atual.Value;
+                    if (alu != null)
+                    {
+                        // formato: matricula;nome;idade
+                        sw.WriteLine($"{alu.Matricula};{alu.Nome};{alu.Idade}");
+                    }
+                    atual = atual.Next;
                 }
             }
         }
 
-        // metodo que grava as disciplinas no arquivo
-        public void GravarDisciplinas(Disciplina[] disciplinas)
+        // grava as disciplinas no arquivo percorrendo a lista encadeada
+        public void GravarDisciplinas(ListaDisciplinas disciplinas)
         {
             using (StreamWriter sw = new StreamWriter("Disciplinas.dat"))
             {
-                // grava cada disciplina em uma linha
-                foreach (var disciplina in disciplinas)
+                NodeDisciplina atual = disciplinas.Head;
+                while (atual != null)
                 {
-                    sw.WriteLine($"{disciplina.Codigo};{disciplina.Nome};{disciplina.NotaMinima}");
+                    Disciplina disc = atual.Value;
+                    if (disc != null)
+                    {
+                        // formato: codigo;nome;notaminima
+                        sw.WriteLine($"{disc.Codigo};{disc.Nome};{disc.NotaMinima}");
+                    }
+                    atual = atual.Next;
                 }
             }
         }
 
-        // metodo que grava as matriculas no arquivo
-        public void GravarMatriculas(Matricula[] matriculas)
+        // grava as matriculas no arquivo percorrendo a lista encadeada
+        public void GravarMatriculas(ListaMatriculas matriculas)
         {
-            string arquivo = "Matriculas.dat";
-            
-            using (StreamWriter sw = new StreamWriter(arquivo))
+            using (StreamWriter sw = new StreamWriter("Matriculas.dat"))
             {
-                // grava cada matricula com os dados relacionados
-                foreach (var matricula in matriculas)
+                NodeMatricula atual = matriculas.Head;
+                while (atual != null)
                 {
-                    sw.WriteLine($"{matricula.disciplina.Codigo};{matricula.aluno.Matricula};{matricula.Nota1};{matricula.Nota2}");
+                    Matricula m = atual.Value;
+                    if (m != null && m.disciplina != null && m.aluno != null)
+                    {
+                        // formato: codigoDisciplina;matriculaAluno;nota1;nota2
+                        sw.WriteLine($"{m.disciplina.Codigo};{m.aluno.Matricula};{m.Nota1};{m.Nota2}");
+                    }
+                    atual = atual.Next;
                 }
             }
         }

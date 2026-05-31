@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,9 +58,12 @@ namespace SistemaNotasAlunos.Controller
                         break;
 
 
-                    //encerra o programa
+                    //encerra o programa e grava tudo nos arquivos
                     case 4:
-                        Console.WriteLine("Saindo...");
+                        alunoController.GravarAlunos();
+                        DisciplinaController.GravarDisciplinas();
+                        matriculaController.GravarMatriculas();
+                        Console.WriteLine("Dados salvos com sucesso! Saindo...");
                         break;
                 }
 

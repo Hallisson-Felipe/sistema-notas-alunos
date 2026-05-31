@@ -1,4 +1,4 @@
-﻿using SistemaNotasAlunos.Controller;
+using SistemaNotasAlunos.Controller;
 using SistemaNotasAlunos.View;
 using System;
 using SistemaNotasAlunos.Model;
@@ -43,7 +43,6 @@ namespace SistemaNotasAlunos.View
         {
             while (true)
             {
-                //pergunta ao usuario o que ele quer consultar
                 Console.Clear();
                 ExibirCabecalho("CONSULTAS");
                 Console.WriteLine("  1. Alunos");
@@ -56,84 +55,132 @@ namespace SistemaNotasAlunos.View
 
                 switch (Console.ReadLine())
                 {
-                    //busca o aluno pelo o nome ou matricula atraves do metodo "Buscar" de AlunoController
+                    // Consulta de Alunos: lista todos os alunos cadastrados na lista encadeada
                     case "1":
-                        Console.Write("Nome ou matrícula do aluno: ");
-                        string resp = Console.ReadLine();
-                        int matBusca = -1;
-                        if (int.TryParse(resp, out int mb))
+                        Console.Clear();
+                        ExibirCabecalho("LISTAGEM DE ALUNOS");
+                        var atualAluno = menuController.alunoController.alunos.Head;
+                        if (atualAluno == null)
                         {
-                            matBusca = mb;
-                        }
-                        Aluno aluno = menuController.alunoController.Buscar(resp, matBusca);
-                        if (aluno == null)
-                        {
-                            Console.WriteLine("Aluno não encontrado.");
+                            Console.WriteLine("Nenhum aluno cadastrado no sistema.");
                         }
                         else
                         {
-                            Console.WriteLine($"Aluno: {aluno.Nome} | Matrícula: {aluno.Matricula} | Idade: {aluno.Idade}");
+                            while (atualAluno != null)
+                            {
+                                Aluno al = atualAluno.Value;
+                                if (al != null)
+                                {
+                                    Console.WriteLine($"Nome: {al.Nome} | Matrícula: {al.Matricula} | Idade: {al.Idade}");
+                                }
+                                atualAluno = atualAluno.Next; // caminha pela lista
+                            }
                         }
                         Console.ReadKey();
                         break;
 
-                    //busca a disciplina pelo o nome ou codigo atraves do metodo "Buscar" de DisciplinaController
+                    // Consulta de Disciplinas: lista todas as disciplinas cadastradas na lista encadeada
                     case "2":
-                        Console.Write("Nome ou código da disciplina: ");
-                        string resp2 = Console.ReadLine();
-                        int codBusca = -1;
-
-                        if (int.TryParse(resp2, out int cb))
+                        Console.Clear();
+                        ExibirCabecalho("LISTAGEM DE DISCIPLINAS");
+                        var atualDisc = menuController.DisciplinaController.disciplinas.Head;
+                        if (atualDisc == null)
                         {
-                            codBusca = cb;
-                        }
-                        Disciplina disciplina = menuController.DisciplinaController.Buscar(resp2, codBusca);
-                        if (disciplina == null)
-                        {
-                            Console.WriteLine("Disciplina não encontrada.");
+                            Console.WriteLine("Nenhuma disciplina cadastrada no sistema.");
                         }
                         else
                         {
-                            Console.WriteLine($"Disciplina: {disciplina.Nome} | Código: {disciplina.Codigo} | Nota Mínima: {disciplina.NotaMinima}");
+                            while (atualDisc != null)
+                            {
+                                Disciplina d = atualDisc.Value;
+                                if (d != null)
+                                {
+                                    Console.WriteLine($"Disciplina: {d.Nome} | Código: {d.Codigo} | Nota Mínima: {d.NotaMinima}");
+                                }
+                                atualDisc = atualDisc.Next; // caminha pela lista
+                            }
                         }
                         Console.ReadKey();
                         break;
 
-                    //consulta os alunos matriculados em uma disciplina pelo nome ou codigo da disciplina
-                    //atraves do metodo "AlunosDaDisciplina" de MatriculaController
+                    // Consulta de Alunos de uma Disciplina: solicita e valida a disciplina em loop
                     case "3":
-                        Console.Write("Nome ou código da disciplina: ");
-                        string resp3 = Console.ReadLine();
-                        int codDisc = -1;
-                        if(int.TryParse(resp3, out int cd))
+                        Console.Clear();
+                        ExibirCabecalho("CONSULTA DE ALUNOS DA DISCIPLINA");
+                        Disciplina discBusca = null;
+                        while (true)
                         {
-                            codDisc = cd;
+                            Console.Write("Digite o nome ou código da disciplina (ou deixe em branco para cancelar): ");
+                            string resp3 = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(resp3)) break;
+
+                            int codDisc = -1;
+                            if (int.TryParse(resp3, out int cd))
+                            {
+                                codDisc = cd;
+                            }
+
+                            discBusca = menuController.DisciplinaController.Buscar(resp3, codDisc);
+                            if (discBusca == null)
+                            {
+                                Console.WriteLine("Disciplina não existe! Por favor, informe uma disciplina válida.");
+                                continue;
+                            }
+                            break; // sai do loop de validação
                         }
-                        Console.WriteLine(menuController.matriculaController.AlunosDaDisciplina(resp3, codDisc));
+
+                        if (discBusca != null)
+                        {
+                            Console.WriteLine(menuController.matriculaController.AlunosDaDisciplina(discBusca));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Consulta cancelada.");
+                        }
                         Console.ReadKey();
                         break;
 
-                    //consulta as disciplinas em que o aluno esta matriculado pelo nome ou matricula do aluno
-                    //atraves do metodo "DisciplinasDoAluno"
+                    // Consulta de Disciplinas de um Aluno: solicita e valida o aluno em loop
                     case "4":
-                        Console.Write("Nome ou matrícula do aluno: ");
-                        string resp4 = Console.ReadLine();
-                        int matAluno4 = -1;
-                        if (int.TryParse(resp4, out int ma4))
+                        Console.Clear();
+                        ExibirCabecalho("CONSULTA DE DISCIPLINAS DO ALUNO");
+                        Aluno alunoBusca = null;
+                        while (true)
                         {
-                            matAluno4 = ma4;
+                            Console.Write("Digite o nome ou matrícula do aluno (ou deixe em branco para cancelar): ");
+                            string resp4 = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(resp4)) break;
+
+                            int matAluno4 = -1;
+                            if (int.TryParse(resp4, out int ma4))
+                            {
+                                matAluno4 = ma4;
+                            }
+
+                            alunoBusca = menuController.alunoController.Buscar(resp4, matAluno4);
+                            if (alunoBusca == null)
+                            {
+                                Console.WriteLine("Aluno não existe! Por favor, informe um aluno válido.");
+                                continue;
+                            }
+                            break; // sai do loop de validação
                         }
-                        string disciplinas = menuController.matriculaController.DisciplinasDoAluno(resp4, matAluno4);
-                        foreach (var nome in disciplinas.Split(';', StringSplitOptions.RemoveEmptyEntries))
-                            Console.WriteLine(nome);
+
+                        if (alunoBusca != null)
+                        {
+                            string resultado = menuController.matriculaController.DisciplinasDoAluno(alunoBusca);
+                            Console.WriteLine(resultado);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Consulta cancelada.");
+                        }
                         Console.ReadKey();
                         break;
 
-                    //caso o usuario escolha "0", volta ao menu principal
                     case "0":
                         return 0;
 
-                    //mensagem padrao caso o usuario digite uma opcao que nao existe
                     default:
                         Console.WriteLine("Opção inválida. Digite um número entre 0 e 4.");
                         Console.ReadKey();
@@ -142,11 +189,11 @@ namespace SistemaNotasAlunos.View
             }
         }
 
+        //exibe o menu de cadastros
         public static int ExibirMenuCadastros(MenuController menuController)
         {
             while (true)
             {
-                //pergunta ao usuario o que ele quer cadastrar
                 Console.Clear();
                 ExibirCabecalho("CADASTROS");
                 Console.WriteLine("  1. Alunos");
@@ -159,13 +206,20 @@ namespace SistemaNotasAlunos.View
 
                 switch (Console.ReadLine())
                 {
-                    //pede o nome e idade do aluno e faz o cadastro atrvaes do metodo "Cadastro" de AlunoController
-                    //que gera a matrícula automaticamente
+                    // Cadastro de Alunos: nome e idade. Matrícula é calculada e validada como única.
                     case "1":
+                        Console.Clear();
+                        ExibirCabecalho("CADASTRO DE ALUNO");
                         Console.Write("Nome do aluno: ");
                         string nomeAluno = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(nomeAluno))
+                        {
+                            Console.WriteLine("Nome não pode ser vazio.");
+                            Console.ReadKey();
+                            break;
+                        }
                         Console.Write("Idade do aluno: ");
-                        if (!int.TryParse(Console.ReadLine(), out int idadeAluno))
+                        if (!int.TryParse(Console.ReadLine(), out int idadeAluno) || idadeAluno < 0)
                         {
                             Console.WriteLine("Idade inválida.");
                             Console.ReadKey();
@@ -176,14 +230,20 @@ namespace SistemaNotasAlunos.View
                         Console.ReadKey();
                         break;
 
-
-                    //pede o nome e a nota minima da disciplina e faz o cadastro usando o metodo "Cadastro" de DisciplinasController
-                    //que gera o codigo automaticamente
+                    // Cadastro de Disciplinas: nome e nota mínima. Código é calculado e validado como único.
                     case "2":
+                        Console.Clear();
+                        ExibirCabecalho("CADASTRO DE DISCIPLINA");
                         Console.Write("Nome da disciplina: ");
                         string nomeDisciplina = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(nomeDisciplina))
+                        {
+                            Console.WriteLine("Nome da disciplina não pode ser vazio.");
+                            Console.ReadKey();
+                            break;
+                        }
                         Console.Write("Nota mínima para aprovação: ");
-                        if (!double.TryParse(Console.ReadLine(), out double notaMinima))
+                        if (!double.TryParse(Console.ReadLine(), out double notaMinima) || notaMinima < 0)
                         {
                             Console.WriteLine("Nota inválida.");
                             Console.ReadKey();
@@ -194,34 +254,72 @@ namespace SistemaNotasAlunos.View
                         Console.ReadKey();
                         break;
 
-                    //pede o nome/matricula do aluno e o nome/codigo da disciplina e faz o cadastro da matricula
-                    //pelo metodo "Cadastro" de MatriculaController
+                    // Cadastro de Matrículas: solicita aluno e disciplina em loops de validação separados
                     case "3":
-                        Console.Write("Nome ou matrícula do aluno: ");
-                        string respAluno = Console.ReadLine();
-                        Console.Write("Nome ou código da disciplina: ");
-                        string respDisc = Console.ReadLine();
-                        int matAluno3 = -1;
-                        if (int.TryParse(respAluno, out int aux))
+                        Console.Clear();
+                        ExibirCabecalho("CADASTRO DE MATRÍCULA");
+                        Aluno alMat = null;
+                        Disciplina discMat = null;
+
+                        // Valida a escolha do Aluno
+                        while (alMat == null)
                         {
-                            matAluno3 = aux;
+                            Console.Write("Nome ou matrícula do aluno (ou deixe em branco para cancelar): ");
+                            string respAluno = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(respAluno)) break;
+
+                            int matAluno3 = -1;
+                            if (int.TryParse(respAluno, out int aux))
+                            {
+                                matAluno3 = aux;
+                            }
+
+                            alMat = menuController.alunoController.Buscar(respAluno, matAluno3);
+                            if (alMat == null)
+                            {
+                                Console.WriteLine("Aluno não encontrado! Por favor, digite novamente.");
+                            }
                         }
 
-                        int codDisc3b = -1;
-                        if (int.TryParse(respDisc, out aux))
+                        if (alMat == null)
                         {
-                            codDisc3b = aux;
+                            Console.WriteLine("Operação cancelada.");
+                            Console.ReadKey();
+                            break;
                         }
 
-                        string resultado = menuController.matriculaController.Cadastro(respAluno, matAluno3, respDisc, codDisc3b);
+                        // Valida a escolha da Disciplina
+                        while (discMat == null)
+                        {
+                            Console.Write("Nome ou código da disciplina (ou deixe em branco para cancelar): ");
+                            string respDisc = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(respDisc)) break;
 
-                        if (resultado == "Aluno não encontrado.")
-                        {
-                            Console.WriteLine("Aluno não encontrado. Matrícula não realizada.");
+                            int codDisc3b = -1;
+                            if (int.TryParse(respDisc, out int aux))
+                            {
+                                codDisc3b = aux;
+                            }
+
+                            discMat = menuController.DisciplinaController.Buscar(respDisc, codDisc3b);
+                            if (discMat == null)
+                            {
+                                Console.WriteLine("Disciplina não encontrada! Por favor, digite novamente.");
+                            }
                         }
-                        else if (resultado == "Disciplina não encontrada.")
+
+                        if (discMat == null)
                         {
-                            Console.WriteLine("Disciplina não encontrada. Matrícula não realizada.");
+                            Console.WriteLine("Operação cancelada.");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        // Realiza o cadastro
+                        string resultadoMat = menuController.matriculaController.Cadastro(alMat, discMat);
+                        if (resultadoMat != null)
+                        {
+                            Console.WriteLine(resultadoMat);
                         }
                         else
                         {
@@ -230,50 +328,107 @@ namespace SistemaNotasAlunos.View
                         Console.ReadKey();
                         break;
 
-                    //atribui as notas do aluno pedindo nome/matricula do aluno e nome/codigo da disciplina
-                    //atraves do metodo "AtribuirNota" de MatriculaController
+                    // Atribuir Notas: solicita aluno e disciplina em loop. Informa as notas e atualiza.
                     case "4":
-                        Console.Write("Nome ou matrícula do aluno: ");
-                        string alunoNota = Console.ReadLine();
-                        Console.Write("Nome ou código da disciplina: ");
-                        string discNota = Console.ReadLine();
-                        Console.Write("Nota 1: ");
-                        if (!double.TryParse(Console.ReadLine(), out double nota1))
+                        Console.Clear();
+                        ExibirCabecalho("ATRIBUIR NOTA AO ALUNO");
+                        Aluno alNota = null;
+                        Disciplina discNota = null;
+
+                        // Valida Aluno
+                        while (alNota == null)
                         {
-                            Console.WriteLine("Nota 1 inválida.");
+                            Console.Write("Nome ou matrícula do aluno (ou deixe em branco para cancelar): ");
+                            string alunoNota = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(alunoNota)) break;
+
+                            int matNota = -1;
+                            if (int.TryParse(alunoNota, out int mn))
+                            {
+                                matNota = mn;
+                            }
+
+                            alNota = menuController.alunoController.Buscar(alunoNota, matNota);
+                            if (alNota == null)
+                            {
+                                Console.WriteLine("Aluno não encontrado! Por favor, digite novamente.");
+                            }
+                        }
+
+                        if (alNota == null)
+                        {
+                            Console.WriteLine("Operação cancelada.");
                             Console.ReadKey();
                             break;
                         }
-                        Console.Write("Nota 2: ");
-                        if (!double.TryParse(Console.ReadLine(), out double nota2))
+
+                        // Valida Disciplina
+                        while (discNota == null)
                         {
-                            Console.WriteLine("Nota 2 inválida.");
+                            Console.Write("Nome ou código da disciplina (ou deixe em branco para cancelar): ");
+                            string discNotaInput = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(discNotaInput)) break;
+
+                            int codNota = -1;
+                            if (int.TryParse(discNotaInput, out int cn))
+                            {
+                                codNota = cn;
+                            }
+
+                            discNota = menuController.DisciplinaController.Buscar(discNotaInput, codNota);
+                            if (discNota == null)
+                            {
+                                Console.WriteLine("Disciplina não encontrada! Por favor, digite novamente.");
+                            }
+                        }
+
+                        if (discNota == null)
+                        {
+                            Console.WriteLine("Operação cancelada.");
                             Console.ReadKey();
                             break;
                         }
 
-                        int matNota = -1;
-                        if (int.TryParse(alunoNota, out int mn))
+                        // Localiza a matrícula correspondente
+                        Matricula m = menuController.matriculaController.BuscarMatricula(alNota, discNota);
+                        if (m == null)
                         {
-                            matNota = mn;
+                            Console.WriteLine("Erro: O aluno não está matriculado nesta disciplina.");
+                            Console.ReadKey();
+                            break;
                         }
 
-                        int codNota = -1;
-                        if (int.TryParse(discNota, out int cn))
+                        // Exibe as notas atuais
+                        Console.WriteLine($"Notas atuais na disciplina {discNota.Nome}:");
+                        Console.WriteLine($"  Nota 1: {m.Nota1:F1}");
+                        Console.WriteLine($"  Nota 2: {m.Nota2:F1}");
+                        ExibirSeparador();
+
+                        // Solicita novas notas
+                        Console.Write("Nova Nota 1: ");
+                        if (!double.TryParse(Console.ReadLine(), out double nota1) || nota1 < 0 || nota1 > 10)
                         {
-                            codNota = cn;
+                            Console.WriteLine("Nota 1 inválida. Deve ser de 0 a 10.");
+                            Console.ReadKey();
+                            break;
                         }
 
-                        bool atribuido = menuController.matriculaController.AtribuirNota(alunoNota, matNota, discNota, codNota, nota1, nota2);
-                        Console.WriteLine(atribuido ? "Nota atribuída com sucesso!" : "Aluno ou disciplina não encontrados.");
+                        Console.Write("Nova Nota 2: ");
+                        if (!double.TryParse(Console.ReadLine(), out double nota2) || nota2 < 0 || nota2 > 10)
+                        {
+                            Console.WriteLine("Nota 2 inválida. Deve ser de 0 a 10.");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        menuController.matriculaController.AtribuirNota(m, nota1, nota2);
+                        Console.WriteLine("Notas atribuídas com sucesso!");
                         Console.ReadKey();
                         break;
 
-                    //caso o usuario escolha "0", volta ao menu principal
                     case "0":
                         return 0;
 
-                    //mensagem padrao caso o usuario digite uma opcao que nao existe
                     default:
                         Console.WriteLine("Opção inválida. Digite um número entre 0 e 4.");
                         Console.ReadKey();

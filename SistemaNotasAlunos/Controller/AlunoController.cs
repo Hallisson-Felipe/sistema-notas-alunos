@@ -1,49 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using SistemaNotasAlunos.Model;
 
 namespace SistemaNotasAlunos.Controller
 {
+    // controller de aluno
     public class AlunoController
     {
-        public Aluno[] alunos {  get; set; }
-        int qtdAlunos = 0;
+        // lista duplamente encadeada de alunos
+        public ListaAlunos alunos { get; set; }
 
-        //instancia o controller de arquivo para ler os alunos do arquivo e preencher o vetor de alunos
-        ArquivoController ar = new ArquivoController();
+        private ArquivoController ar = new ArquivoController();
 
-        //construtor do controller de aluno, le os alunos do arquivo e preenche o vetor de alunos
+        // construtor: carrega os alunos do arquivo ao iniciar
         public AlunoController()
         {
-            var alunosLidos = ar.LerAlunos();
-            alunos = new Aluno[100];
-            qtdAlunos = 0;
-
-            for (int i = 0; i < alunosLidos.Length; i++)
-            {
-                alunos[i] = alunosLidos[i];
-                qtdAlunos++;
-            }
+            alunos = ar.LerAlunos();
         }
 
-
-
-        //cadastra aluno
+        // cadastra um novo aluno na lista
         public void Cadastrar(string nome, int idade)
         {
-            alunos[qtdAlunos] = new Aluno();
+            Aluno novoAluno = new Aluno
+            {
+                Idade = idade,
+                Nome = nome,
+                Matricula = GerarMatricula()
+            };
 
-            alunos[qtdAlunos].Idade = idade;
-            alunos[qtdAlunos].Nome = nome;
-            alunos[qtdAlunos].Matricula = GerarMatricula();
-
-            qtdAlunos++;
+            // adiciona na lista duplamente encadeada
+            alunos.Adicionar(novoAluno);
         }
 
-        //gera a matricula e verifica se nao ha duplicidade
+        // gera matricula aleatoria sem repetir
         public int GerarMatricula()
         {
             int rand;
@@ -51,59 +39,58 @@ namespace SistemaNotasAlunos.Controller
             {
                 bool find = false;
                 rand = Random.Shared.Next(100, 1000);
-                for (int i = 0; i < qtdAlunos; i++)
+
+                // percorre a lista procurando se o numero ja existe
+                NodeAluno atual = alunos.Head;
+                while (atual != null)
                 {
-                    if (alunos[i].Matricula == rand)
+                    if (atual.Value != null && atual.Value.Matricula == rand)
                     {
                         find = true;
                         break;
                     }
+                    atual = atual.Next;
                 }
-                if (find)
+
+                if (!find)
                 {
-                    continue;
+                    break;
                 }
-                break;
             }
             return rand;
         }
 
-        //busca aluno pelo nome ou pela matricula.
+        // busca o aluno pelo nome ou pela matricula
         public Aluno Buscar(string nome = "", int matricula = -1)
         {
-            foreach (Aluno aluno in alunos)
+            // percorre a lista do inicio ao fim
+            NodeAluno atual = alunos.Head;
+            while (atual != null)
             {
-                if (aluno == null)
-                { 
-                    continue; 
-                }
-
-                if (aluno.Nome.Trim().Equals(nome.Trim(), StringComparison.OrdinalIgnoreCase))
+                Aluno aluno = atual.Value;
+                if (aluno != null)
                 {
-                    return aluno;
-                }
+                    // verifica se bate o nome (ignora maiuscula e minuscula)
+                    if (!string.IsNullOrEmpty(nome) && aluno.Nome.Trim().ToLower() == nome.Trim().ToLower())
+                    {
+                        return aluno;
+                    }
 
-                if (aluno.Matricula == matricula)
-                {
-                    return aluno;
+                    // verifica se bate a matricula
+                    if (matricula != -1 && aluno.Matricula == matricula)
+                    {
+                        return aluno;
+                    }
                 }
+                atual = atual.Next;
             }
-            //caso nao encontre retorna nulo
             return null;
         }
 
-        //grava os alunos no arquivo
+        // grava os alunos no arquivo dat
         public void GravarAlunos()
         {
-            Aluno[] alunosValidos = new Aluno[qtdAlunos];
-
-            for (int i = 0; i < qtdAlunos; i++)
-            {
-                alunosValidos[i] = alunos[i];
-            }
-
-            ar.GravarAlunos(alunosValidos);
+            ar.GravarAlunos(alunos);
         }
-
     }
 }

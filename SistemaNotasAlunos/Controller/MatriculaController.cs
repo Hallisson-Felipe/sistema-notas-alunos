@@ -1,47 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using SistemaNotasAlunos.Model;
 
 namespace SistemaNotasAlunos.Controller
 {
+    // controller de matriculas
     public class MatriculaController
     {
-        //instacia os objetos alunoController, disciplinaController e arquivoController
-        AlunoController alunoController;
-        DisciplinaController disciplinaController;
-        ArquivoController arquivoController = new ArquivoController();
-        
-        //inicializa o vetor de matriculas com 100 posicoes
-        Matricula[] matriculas = new Matricula[100];
-        int qtdMatriculas = 0;
+        private AlunoController alunoController;
+        private DisciplinaController disciplinaController;
+        private ArquivoController arquivoController = new ArquivoController();
 
-        //contrutor de matricula controller que le as matriculas do arquivo e preenche o vetor
+        // lista duplamente encadeada de matriculas
+        public ListaMatriculas matriculas { get; set; }
+
+        // construtor: recebe os controllers de aluno e disciplina
         public MatriculaController(AlunoController ac, DisciplinaController dc)
         {
             alunoController = ac;
             disciplinaController = dc;
 
-            var matriculasLidas = arquivoController.LerMatricula(alunoController.alunos, disciplinaController.disciplinas);
-            qtdMatriculas = 0;
-
-            if (matriculasLidas != null)
-            {
-                for (int i = 0; i < matriculasLidas.Length && i < matriculas.Length; i++)
-                {
-                    matriculas[i] = matriculasLidas[i];
-                    qtdMatriculas++;
-                }
-            }
+            // le do arquivo passando as listas ja carregadas
+            matriculas = arquivoController.LerMatricula(alunoController.alunos, disciplinaController.disciplinas);
         }
 
-        //metodo que cadastra matriculas a partir do nome/matricula do aluno e nome/codigo da disciplina
-        public string Cadastro(string nomeAluno = "", int matriculaAluno = -1, string nomeDisciplina = "", int codigoDisciplina = -1)
+        // cadastra matricula
+        public string Cadastro(Aluno aluno, Disciplina disciplina)
         {
-            Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
-            Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
             if (aluno == null)
             {
                 return "Aluno não encontrado.";
@@ -51,96 +35,148 @@ namespace SistemaNotasAlunos.Controller
                 return "Disciplina não encontrada.";
             }
 
-            matriculas[qtdMatriculas] = new Matricula();
-            matriculas[qtdMatriculas].aluno = aluno;
-            matriculas[qtdMatriculas].disciplina = disciplina;
-            qtdMatriculas++;
+            // verifica se ja esta matriculado percorrendo a lista
+            NodeMatricula atual = matriculas.Head;
+            while (atual != null)
+            {
+                if (atual.Value != null && 
+                    atual.Value.aluno.Matricula == aluno.Matricula && 
+                    atual.Value.disciplina.Codigo == disciplina.Codigo)
+                {
+                    return "Aluno já está matriculado nesta disciplina.";
+                }
+                atual = atual.Next;
+            }
 
+            Matricula novaMatricula = new Matricula
+            {
+                aluno = aluno,
+                disciplina = disciplina
+            };
+
+            // adiciona na lista
+            matriculas.Adicionar(novaMatricula);
             return null;
         }
 
-        //metodo que retorna a string com todos os alunos matriculados em uma disciplina
-        public string AlunosDaDisciplina(string nomeDisciplina = "", int codigoDisciplina = -1)
+        // sobrecarga para cadastrar matricula pelo nome/codigo
+        public string Cadastro(string nomeAluno = "", int matriculaAluno = -1, string nomeDisciplina = "", int codigoDisciplina = -1)
         {
-            string resultado = "";
+            Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
             Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
+            return Cadastro(aluno, disciplina);
+        }
 
+        // retorna alunos da disciplina com notas e situacao
+        public string AlunosDaDisciplina(Disciplina disciplina)
+        {
             if (disciplina == null)
                 return "Disciplina não encontrada.";
 
-            for (int i = 0; i < qtdMatriculas; i++)
+            string resultado = "";
+            NodeMatricula atual = matriculas.Head;
+
+            // percorre a lista procurando matriculas dessa disciplina
+            while (atual != null)
             {
-                if (matriculas[i] == null) continue;
-
-                if (matriculas[i].disciplina.Codigo == disciplina.Codigo)
+                Matricula m = atual.Value;
+                if (m != null && m.disciplina.Codigo == disciplina.Codigo)
                 {
-                    double nota1 = matriculas[i].Nota1;
-                    double nota2 = matriculas[i].Nota2;
+                    double nota1 = m.Nota1;
+                    double nota2 = m.Nota2;
                     double media = (nota1 + nota2) / 2;
-                    string status = "";
-                    if (media >= disciplina.NotaMinima)
-                    {
-                        status = "Aprovado";
-                    }
-                    else
-                    {
-                        status = "Reprovado";
-                    }
+                    string status = media >= disciplina.NotaMinima ? "Aprovado" : "Reprovado";
 
-                    resultado += $"Aluno: {matriculas[i].aluno.Nome} | " +
+                    resultado += $"Aluno: {m.aluno.Nome} | " +
                                  $"Nota1: {nota1} | Nota2: {nota2} | " +
                                  $"Média: {media:F2} | {status}\n";
                 }
+                atual = atual.Next;
             }
 
             return resultado == "" ? "Nenhum aluno encontrado para essa disciplina." : resultado;
         }
 
-        //metodo que retorna s tring com todos as disciplinas em que um aluno esta matriculado
-        public string DisciplinasDoAluno(string nomeAluno = "", int matriculaAluno = -1)
+        // sobrecarga de alunos da disciplina pelo nome/codigo
+        public string AlunosDaDisciplina(string nomeDisciplina = "", int codigoDisciplina = -1)
         {
-            string resultado = "";
-            Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
+            Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
+            return AlunosDaDisciplina(disciplina);
+        }
 
+        // retorna disciplinas do aluno com notas e situacao
+        public string DisciplinasDoAluno(Aluno aluno)
+        {
             if (aluno == null)
                 return "Aluno não encontrado.";
 
-            for (int i = 0; i < qtdMatriculas; i++)
+            string resultado = "";
+            NodeMatricula atual = matriculas.Head;
+
+            // percorre a lista procurando matriculas desse aluno
+            while (atual != null)
             {
-                if (matriculas[i] == null) continue;
-
-                if (matriculas[i].aluno.Matricula == aluno.Matricula)
+                Matricula m = atual.Value;
+                if (m != null && m.aluno.Matricula == aluno.Matricula)
                 {
-                    Disciplina disciplina = matriculas[i].disciplina;
-
-                    double nota1 = matriculas[i].Nota1;
-                    double nota2 = matriculas[i].Nota2;
+                    Disciplina disciplina = m.disciplina;
+                    double nota1 = m.Nota1;
+                    double nota2 = m.Nota2;
                     double media = (nota1 + nota2) / 2;
-                    string status = "";
-                    if (media >= disciplina.NotaMinima) {
-                        status = "Aprovado";
-                    }
-                    else
-                    {
-                        status = "Reprovado";
-                    }
+                    string status = media >= disciplina.NotaMinima ? "Aprovado" : "Reprovado";
 
-                        resultado += $"Disciplina: {disciplina.Nome} | " +
-                                     $"Nota1: {nota1} | Nota2: {nota2} | " +
-                                     $"Média: {media:F2} | {status}\n";
+                    resultado += $"Disciplina: {disciplina.Nome} | " +
+                                 $"Nota1: {nota1} | Nota2: {nota2} | " +
+                                 $"Média: {media:F2} | {status}\n";
                 }
+                atual = atual.Next;
             }
 
             return resultado == "" ? "Nenhuma disciplina encontrada para esse aluno." : resultado;
         }
 
-        //calcula a media do aluno
+        // sobrecarga de disciplinas do aluno pelo nome/matricula
+        public string DisciplinasDoAluno(string nomeAluno = "", int matriculaAluno = -1)
+        {
+            Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
+            return DisciplinasDoAluno(aluno);
+        }
+
+        // calcula a media das notas
         public double CalcularMedia(double nota1, double nota2)
         {
             return (nota1 + nota2) / 2;
         }
 
-        //metodo que atribui as notas ao aluno
+        // busca a matricula na lista encadeada pelo aluno e disciplina
+        public Matricula BuscarMatricula(Aluno aluno, Disciplina disciplina)
+        {
+            if (aluno == null || disciplina == null) return null;
+
+            NodeMatricula atual = matriculas.Head;
+            while (atual != null)
+            {
+                Matricula m = atual.Value;
+                if (m != null && m.aluno.Matricula == aluno.Matricula && m.disciplina.Codigo == disciplina.Codigo)
+                {
+                    return m;
+                }
+                atual = atual.Next;
+            }
+            return null;
+        }
+
+        // atribui nota diretamente na matricula
+        public void AtribuirNota(Matricula matricula, double nota1, double nota2)
+        {
+            if (matricula != null)
+            {
+                matricula.Nota1 = nota1;
+                matricula.Nota2 = nota2;
+            }
+        }
+
+        // atribui nota buscando pelo nome/matricula e disciplina
         public bool AtribuirNota(string nomeAluno = "", int matriculaAluno = -1,
                                   string nomeDisciplina = "", int codigoDisciplina = -1,
                                   double nota1 = 0, double nota2 = 0)
@@ -148,36 +184,20 @@ namespace SistemaNotasAlunos.Controller
             Aluno aluno = alunoController.Buscar(nomeAluno, matriculaAluno);
             Disciplina disciplina = disciplinaController.Buscar(nomeDisciplina, codigoDisciplina);
 
-            if (aluno == null || disciplina == null)
-                return false;
-
-            for (int i = 0; i < qtdMatriculas; i++)
+            Matricula m = BuscarMatricula(aluno, disciplina);
+            if (m != null)
             {
-                if (matriculas[i] == null) continue;
-
-                if (matriculas[i].aluno.Matricula == aluno.Matricula &&
-                    matriculas[i].disciplina.Codigo == disciplina.Codigo)
-                {
-                    matriculas[i].Nota1 = nota1;
-                    matriculas[i].Nota2 = nota2;
-                    return true;
-                }
+                AtribuirNota(m, nota1, nota2);
+                return true;
             }
 
             return false;
         }
 
-        //grava as matriculas no arquivo DAT
+        // grava as matriculas no arquivo
         public void GravarMatriculas()
         {
-            Matricula[] matriculasValidas = new Matricula[qtdMatriculas];
-
-            for (int i = 0; i < qtdMatriculas; i++)
-            {
-                matriculasValidas[i] = matriculas[i];
-            }
-
-            arquivoController.GravarMatriculas(matriculasValidas);
+            arquivoController.GravarMatriculas(matriculas);
         }
     }
 }
