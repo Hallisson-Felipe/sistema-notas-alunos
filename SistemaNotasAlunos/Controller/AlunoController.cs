@@ -7,7 +7,7 @@ namespace SistemaNotasAlunos.Controller
     public class AlunoController
     {
         // lista duplamente encadeada de alunos
-        public ListaAlunos alunos { get; set; }
+        public ListaDuplamenteEncadeada<Aluno> alunos { get; set; }
 
         private ArquivoController ar = new ArquivoController();
 
@@ -41,15 +41,15 @@ namespace SistemaNotasAlunos.Controller
                 rand = Random.Shared.Next(100, 1000);
 
                 // percorre a lista procurando se o numero ja existe
-                NodeAluno atual = alunos.Head;
+                Node<Aluno> atual = alunos.Cabeca;
                 while (atual != null)
                 {
-                    if (atual.Value != null && atual.Value.Matricula == rand)
+                    if (atual.Valor != null && atual.Valor.Matricula == rand)
                     {
                         find = true;
                         break;
                     }
-                    atual = atual.Next;
+                    atual = atual.Prox;
                 }
 
                 if (!find)
@@ -64,10 +64,10 @@ namespace SistemaNotasAlunos.Controller
         public Aluno Buscar(string nome = "", int matricula = -1)
         {
             // percorre a lista do inicio ao fim
-            NodeAluno atual = alunos.Head;
+            Node<Aluno> atual = alunos.Cabeca;
             while (atual != null)
             {
-                Aluno aluno = atual.Value;
+                Aluno aluno = atual.Valor;
                 if (aluno != null)
                 {
                     // verifica se bate o nome (ignora maiuscula e minuscula)
@@ -82,7 +82,7 @@ namespace SistemaNotasAlunos.Controller
                         return aluno;
                     }
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
             return null;
         }

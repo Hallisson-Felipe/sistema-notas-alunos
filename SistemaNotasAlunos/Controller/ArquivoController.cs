@@ -7,26 +7,53 @@ namespace SistemaNotasAlunos.Controller
     // controller de arquivos dat
     public class ArquivoController
     {
-        // le alunos do arquivo dat e retorna uma lista encadeada
-        public ListaAlunos LerAlunos()
-        {
-            var alunos = new ListaAlunos();
+        // caminhos completos dos arquivos de dados
+        private readonly string caminhoAlunos = ObterCaminho("Alunos.dat");
+        private readonly string caminhoDisciplinas = ObterCaminho("Disciplinas.dat");
+        private readonly string caminhoMatriculas = ObterCaminho("Matriculas.dat");
 
-            if (!File.Exists("Alunos.dat"))
+        // obtem o caminho absoluto do arquivo resolvendo para a pasta do projeto ou para a pasta local
+        private static string ObterCaminho(string nomeArquivo)
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            
+            string projetoDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", ".."));
+            // define a pasta Data dentro do diretorio do projeto
+            string dataDirNoProjeto = Path.Combine(projetoDir, "Data");
+
+            // se a pasta Data existe no projeto, retorna o caminho do arquivo la dentro
+            if (Directory.Exists(dataDirNoProjeto))
+            {
+                return Path.Combine(dataDirNoProjeto, nomeArquivo);
+            }
+
+            // se nao encontrar, retorna o caminho local
+            return Path.Combine(baseDir, "Data", nomeArquivo);
+        }
+
+        // le alunos do arquivo dat e retorna uma lista encadeada
+        public ListaDuplamenteEncadeada<Aluno> LerAlunos()
+        {
+            var alunos = new ListaDuplamenteEncadeada<Aluno>();
+
+            // se o arquivo de alunos nao existe, retorna a lista vazia
+            if (!File.Exists(caminhoAlunos))
             {
                 return alunos;
             }
 
-            using (StreamReader sr = new StreamReader("Alunos.dat"))
+            using (StreamReader sr = new StreamReader(caminhoAlunos))
             {
                 string linha;
                 // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
+                    // ignora linhas vazias ou espacos em branco
                     if (string.IsNullOrWhiteSpace(linha)) continue;
 
                     // cada linha tem: matricula;nome;idade
                     var partes = linha.Split(';');
+                    // se tiver todas as partes, parseia e adiciona
                     if (partes.Length >= 3)
                     {
                         var aluno = new Aluno
@@ -35,34 +62,39 @@ namespace SistemaNotasAlunos.Controller
                             Nome = partes[1],
                             Idade = int.Parse(partes[2])
                         };
+                        // adiciona o aluno criado na lista
                         alunos.Adicionar(aluno);
                     }
                 }
             }
 
+            // retorna a lista de alunos populada
             return alunos;
         }
 
         // le disciplinas do arquivo dat e retorna uma lista encadeada
-        public ListaDisciplinas LerDisciplinas()
+        public ListaDuplamenteEncadeada<Disciplina> LerDisciplinas()
         {
-            var disciplinas = new ListaDisciplinas();
+            var disciplinas = new ListaDuplamenteEncadeada<Disciplina>();
 
-            if (!File.Exists("Disciplinas.dat"))
+            // se o arquivo de disciplinas nao existe, retorna a lista vazia
+            if (!File.Exists(caminhoDisciplinas))
             {
                 return disciplinas;
             }
 
-            using (StreamReader sr = new StreamReader("Disciplinas.dat"))
+            using (StreamReader sr = new StreamReader(caminhoDisciplinas))
             {
                 string linha;
                 // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
+                    // ignora linhas vazias ou espacos em branco
                     if (string.IsNullOrWhiteSpace(linha)) continue;
 
-                    // cada linha tem: codigo;nome;notaminima
+                    // cada linha tem: codigo;nome;notaMinima
                     var partes = linha.Split(';');
+                    // se tiver todas as partes, parseia e adiciona
                     if (partes.Length >= 3)
                     {
                         var disciplina = new Disciplina
@@ -71,34 +103,39 @@ namespace SistemaNotasAlunos.Controller
                             Nome = partes[1],
                             NotaMinima = double.Parse(partes[2])
                         };
+                        // adiciona a disciplina criada na lista
                         disciplinas.Adicionar(disciplina);
                     }
                 }
             }
 
+            // retorna a lista de disciplinas populada
             return disciplinas;
         }
 
         // le matriculas do arquivo dat, ligando cada uma ao aluno e disciplina certos
-        public ListaMatriculas LerMatricula(ListaAlunos alunos, ListaDisciplinas disciplinas)
+        public ListaDuplamenteEncadeada<Matricula> LerMatricula(ListaDuplamenteEncadeada<Aluno> alunos, ListaDuplamenteEncadeada<Disciplina> disciplinas)
         {
-            var matriculas = new ListaMatriculas();
+            var matriculas = new ListaDuplamenteEncadeada<Matricula>();
 
-            if (!File.Exists("Matriculas.dat"))
+            // se o arquivo de matriculas nao existe, retorna a lista vazia
+            if (!File.Exists(caminhoMatriculas))
             {
                 return matriculas;
             }
 
-            using (StreamReader sr = new StreamReader("Matriculas.dat"))
+            using (StreamReader sr = new StreamReader(caminhoMatriculas))
             {
                 string linha;
                 // le linha por linha ate o fim do arquivo
                 while ((linha = sr.ReadLine()) != null)
                 {
+                    // ignora linhas vazias ou espacos em branco
                     if (string.IsNullOrWhiteSpace(linha)) continue;
 
                     // cada linha tem: codigoDisciplina;matriculaAluno;nota1;nota2
                     var partes = linha.Split(';');
+                    // se tiver todas as partes, parseia e processa
                     if (partes.Length >= 4)
                     {
                         int codigoDisciplina = int.Parse(partes[0]);
@@ -108,28 +145,28 @@ namespace SistemaNotasAlunos.Controller
 
                         // busca a disciplina correspondente percorrendo a lista
                         Disciplina disc = null;
-                        NodeDisciplina atualDisc = disciplinas.Head;
+                        Node<Disciplina> atualDisc = disciplinas.Cabeca;
                         while (atualDisc != null)
                         {
-                            if (atualDisc.Value != null && atualDisc.Value.Codigo == codigoDisciplina)
+                            if (atualDisc.Valor != null && atualDisc.Valor.Codigo == codigoDisciplina)
                             {
-                                disc = atualDisc.Value;
+                                disc = atualDisc.Valor;
                                 break;
                             }
-                            atualDisc = atualDisc.Next;
+                            atualDisc = atualDisc.Prox;
                         }
 
                         // busca o aluno correspondente percorrendo a lista
                         Aluno alu = null;
-                        NodeAluno atualAlu = alunos.Head;
+                        Node<Aluno> atualAlu = alunos.Cabeca;
                         while (atualAlu != null)
                         {
-                            if (atualAlu.Value != null && atualAlu.Value.Matricula == matriculaAluno)
+                            if (atualAlu.Valor != null && atualAlu.Valor.Matricula == matriculaAluno)
                             {
-                                alu = atualAlu.Value;
+                                alu = atualAlu.Valor;
                                 break;
                             }
-                            atualAlu = atualAlu.Next;
+                            atualAlu = atualAlu.Prox;
                         }
 
                         // so adiciona se encontrou os dois
@@ -142,68 +179,76 @@ namespace SistemaNotasAlunos.Controller
                                 Nota1 = nota1,
                                 Nota2 = nota2
                             };
+                            // adiciona a matricula criada na lista
                             matriculas.Adicionar(m);
                         }
                     }
                 }
             }
 
+            // retorna a lista de matriculas populada
             return matriculas;
         }
 
         // grava os alunos no arquivo percorrendo a lista encadeada
-        public void GravarAlunos(ListaAlunos alunos)
+        public void GravarAlunos(ListaDuplamenteEncadeada<Aluno> alunos)
         {
-            using (StreamWriter sw = new StreamWriter("Alunos.dat"))
+            // garante que a pasta Data exista antes de gravar
+            Directory.CreateDirectory(Path.GetDirectoryName(caminhoAlunos));
+
+            using (StreamWriter sw = new StreamWriter(caminhoAlunos))
             {
-                NodeAluno atual = alunos.Head;
+                Node<Aluno> atual = alunos.Cabeca;
                 while (atual != null)
                 {
-                    Aluno alu = atual.Value;
+                    Aluno alu = atual.Valor;
                     if (alu != null)
                     {
-                        // formato: matricula;nome;idade
                         sw.WriteLine($"{alu.Matricula};{alu.Nome};{alu.Idade}");
                     }
-                    atual = atual.Next;
+                    atual = atual.Prox;
                 }
             }
         }
 
         // grava as disciplinas no arquivo percorrendo a lista encadeada
-        public void GravarDisciplinas(ListaDisciplinas disciplinas)
+        public void GravarDisciplinas(ListaDuplamenteEncadeada<Disciplina> disciplinas)
         {
-            using (StreamWriter sw = new StreamWriter("Disciplinas.dat"))
+            // garante que a pasta Data exista antes de gravar
+            Directory.CreateDirectory(Path.GetDirectoryName(caminhoDisciplinas));
+
+            using (StreamWriter sw = new StreamWriter(caminhoDisciplinas))
             {
-                NodeDisciplina atual = disciplinas.Head;
+                Node<Disciplina> atual = disciplinas.Cabeca;
                 while (atual != null)
                 {
-                    Disciplina disc = atual.Value;
+                    Disciplina disc = atual.Valor;
                     if (disc != null)
                     {
-                        // formato: codigo;nome;notaminima
                         sw.WriteLine($"{disc.Codigo};{disc.Nome};{disc.NotaMinima}");
                     }
-                    atual = atual.Next;
+                    atual = atual.Prox;
                 }
             }
         }
 
         // grava as matriculas no arquivo percorrendo a lista encadeada
-        public void GravarMatriculas(ListaMatriculas matriculas)
+        public void GravarMatriculas(ListaDuplamenteEncadeada<Matricula> matriculas)
         {
-            using (StreamWriter sw = new StreamWriter("Matriculas.dat"))
+            // garante que a pasta Data exista antes de gravar
+            Directory.CreateDirectory(Path.GetDirectoryName(caminhoMatriculas));
+
+            using (StreamWriter sw = new StreamWriter(caminhoMatriculas))
             {
-                NodeMatricula atual = matriculas.Head;
+                Node<Matricula> atual = matriculas.Cabeca;
                 while (atual != null)
                 {
-                    Matricula m = atual.Value;
+                    Matricula m = atual.Valor;
                     if (m != null && m.disciplina != null && m.aluno != null)
                     {
-                        // formato: codigoDisciplina;matriculaAluno;nota1;nota2
                         sw.WriteLine($"{m.disciplina.Codigo};{m.aluno.Matricula};{m.Nota1};{m.Nota2}");
                     }
-                    atual = atual.Next;
+                    atual = atual.Prox;
                 }
             }
         }

@@ -11,7 +11,7 @@ namespace SistemaNotasAlunos.Controller
         private ArquivoController arquivoController = new ArquivoController();
 
         // lista duplamente encadeada de matriculas
-        public ListaMatriculas matriculas { get; set; }
+        public ListaDuplamenteEncadeada<Matricula> matriculas { get; set; }
 
         // construtor: recebe os controllers de aluno e disciplina
         public MatriculaController(AlunoController ac, DisciplinaController dc)
@@ -36,16 +36,16 @@ namespace SistemaNotasAlunos.Controller
             }
 
             // verifica se ja esta matriculado percorrendo a lista
-            NodeMatricula atual = matriculas.Head;
+            Node<Matricula> atual = matriculas.Cabeca;
             while (atual != null)
             {
-                if (atual.Value != null && 
-                    atual.Value.aluno.Matricula == aluno.Matricula && 
-                    atual.Value.disciplina.Codigo == disciplina.Codigo)
+                if (atual.Valor != null && 
+                    atual.Valor.aluno.Matricula == aluno.Matricula && 
+                    atual.Valor.disciplina.Codigo == disciplina.Codigo)
                 {
                     return "Aluno já está matriculado nesta disciplina.";
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
 
             Matricula novaMatricula = new Matricula
@@ -74,12 +74,12 @@ namespace SistemaNotasAlunos.Controller
                 return "Disciplina não encontrada.";
 
             string resultado = "";
-            NodeMatricula atual = matriculas.Head;
+            Node<Matricula> atual = matriculas.Cabeca;
 
             // percorre a lista procurando matriculas dessa disciplina
             while (atual != null)
             {
-                Matricula m = atual.Value;
+                Matricula m = atual.Valor;
                 if (m != null && m.disciplina.Codigo == disciplina.Codigo)
                 {
                     double nota1 = m.Nota1;
@@ -91,7 +91,7 @@ namespace SistemaNotasAlunos.Controller
                                  $"Nota1: {nota1} | Nota2: {nota2} | " +
                                  $"Média: {media:F2} | {status}\n";
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
 
             return resultado == "" ? "Nenhum aluno encontrado para essa disciplina." : resultado;
@@ -111,12 +111,12 @@ namespace SistemaNotasAlunos.Controller
                 return "Aluno não encontrado.";
 
             string resultado = "";
-            NodeMatricula atual = matriculas.Head;
+            Node<Matricula> atual = matriculas.Cabeca;
 
             // percorre a lista procurando matriculas desse aluno
             while (atual != null)
             {
-                Matricula m = atual.Value;
+                Matricula m = atual.Valor;
                 if (m != null && m.aluno.Matricula == aluno.Matricula)
                 {
                     Disciplina disciplina = m.disciplina;
@@ -129,7 +129,7 @@ namespace SistemaNotasAlunos.Controller
                                  $"Nota1: {nota1} | Nota2: {nota2} | " +
                                  $"Média: {media:F2} | {status}\n";
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
 
             return resultado == "" ? "Nenhuma disciplina encontrada para esse aluno." : resultado;
@@ -153,15 +153,15 @@ namespace SistemaNotasAlunos.Controller
         {
             if (aluno == null || disciplina == null) return null;
 
-            NodeMatricula atual = matriculas.Head;
+            Node<Matricula> atual = matriculas.Cabeca;
             while (atual != null)
             {
-                Matricula m = atual.Value;
+                Matricula m = atual.Valor;
                 if (m != null && m.aluno.Matricula == aluno.Matricula && m.disciplina.Codigo == disciplina.Codigo)
                 {
                     return m;
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
             return null;
         }

@@ -7,7 +7,7 @@ namespace SistemaNotasAlunos.Controller
     public class DisciplinaController
     {
         // lista duplamente encadeada de disciplinas
-        public ListaDisciplinas disciplinas { get; set; }
+        public ListaDuplamenteEncadeada<Disciplina> disciplinas { get; set; }
 
         private ArquivoController ar = new ArquivoController();
 
@@ -41,15 +41,15 @@ namespace SistemaNotasAlunos.Controller
                 rand = Random.Shared.Next(100, 1000);
 
                 // percorre a lista procurando se o codigo ja existe
-                NodeDisciplina atual = disciplinas.Head;
+                Node<Disciplina> atual = disciplinas.Cabeca;
                 while (atual != null)
                 {
-                    if (atual.Value != null && atual.Value.Codigo == rand)
+                    if (atual.Valor != null && atual.Valor.Codigo == rand)
                     {
                         find = true;
                         break;
                     }
-                    atual = atual.Next;
+                    atual = atual.Prox;
                 }
 
                 if (!find)
@@ -64,10 +64,10 @@ namespace SistemaNotasAlunos.Controller
         public Disciplina Buscar(string nome, int codigo)
         {
             // percorre a lista do inicio ao fim
-            NodeDisciplina atual = disciplinas.Head;
+            Node<Disciplina> atual = disciplinas.Cabeca;
             while (atual != null)
             {
-                Disciplina d = atual.Value;
+                Disciplina d = atual.Valor;
                 if (d != null)
                 {
                     // ve se o nome bate (ignora maiuscula/minuscula)
@@ -82,7 +82,7 @@ namespace SistemaNotasAlunos.Controller
                         return d;
                     }
                 }
-                atual = atual.Next;
+                atual = atual.Prox;
             }
             return null;
         }

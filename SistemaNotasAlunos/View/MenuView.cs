@@ -59,7 +59,7 @@ namespace SistemaNotasAlunos.View
                     case "1":
                         Console.Clear();
                         ExibirCabecalho("LISTAGEM DE ALUNOS");
-                        var atualAluno = menuController.alunoController.alunos.Head;
+                        var atualAluno = menuController.alunoController.alunos.Cabeca;
                         if (atualAluno == null)
                         {
                             Console.WriteLine("Nenhum aluno cadastrado no sistema.");
@@ -68,12 +68,12 @@ namespace SistemaNotasAlunos.View
                         {
                             while (atualAluno != null)
                             {
-                                Aluno al = atualAluno.Value;
+                                Aluno al = atualAluno.Valor;
                                 if (al != null)
                                 {
                                     Console.WriteLine($"Nome: {al.Nome} | Matrícula: {al.Matricula} | Idade: {al.Idade}");
                                 }
-                                atualAluno = atualAluno.Next; // caminha pela lista
+                                atualAluno = atualAluno.Prox; // caminha pela lista
                             }
                         }
                         Console.ReadKey();
@@ -83,7 +83,7 @@ namespace SistemaNotasAlunos.View
                     case "2":
                         Console.Clear();
                         ExibirCabecalho("LISTAGEM DE DISCIPLINAS");
-                        var atualDisc = menuController.DisciplinaController.disciplinas.Head;
+                        var atualDisc = menuController.DisciplinaController.disciplinas.Cabeca;
                         if (atualDisc == null)
                         {
                             Console.WriteLine("Nenhuma disciplina cadastrada no sistema.");
@@ -92,12 +92,12 @@ namespace SistemaNotasAlunos.View
                         {
                             while (atualDisc != null)
                             {
-                                Disciplina d = atualDisc.Value;
+                                Disciplina d = atualDisc.Valor;
                                 if (d != null)
                                 {
                                     Console.WriteLine($"Disciplina: {d.Nome} | Código: {d.Codigo} | Nota Mínima: {d.NotaMinima}");
                                 }
-                                atualDisc = atualDisc.Next; // caminha pela lista
+                                atualDisc = atualDisc.Prox; // caminha pela lista
                             }
                         }
                         Console.ReadKey();
